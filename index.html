@@ -1,0 +1,283 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dions Clicker</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+        {
+            "imports": {
+                "ethers": "https://cdn.ethers.io/lib/ethers-5.4.umd.min.js"
+            }
+        }
+    </script>
+    <script src="script.js" type="module"></script>
+</head>
+<body>
+    <header>
+        <h1>Dions Clicker</h1>
+        <p>Gana DIONS haciendo clic</p>
+    </header>
+
+    <main>
+        <div id="dions-counter">DIONS: 0</div>
+        <button id="click-button">¡Clic aquí!</button>
+        <button id="connect-wallet">Conectar MetaMask</button>
+        <div id="wallet-address"></div>
+
+        <div id="upgrades">
+            <h2>Mejoras</h2>
+            <button id="auto-click">Auto-clic (50 DIONS)</button>
+            <button id="multiplier">Multiplicador x2 (100 DIONS)</button>
+        </div>
+
+        <div id="daily-limit-info">
+            DIONS emitidos hoy: 0/10000
+        </div>
+
+        <div id="tutorial-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2>¿Cómo funciona?</h2>
+                <p>Haz clic en el botón para ganar DIONS. Conecta tu billetera MetaMask para recibir tus DIONS.</p>
+                <p>Puedes comprar mejoras como el "Auto-clic" y el "Multiplicador x2" para ganar DIONS más rápido.</p>
+                <p>El Auto-clic genera DIONS automáticamente, y el Multiplicador x2 duplica tus ganancias por clic.</p>
+                <p>¡Cada mejora tiene un límite de compras, así que úsalas sabiamente!</p>
+            </div>
+        </div>
+
+        <div id="upgrade-notification"></div>
+
+        <section id="sustainability">
+            <h2>¿Por qué esto no es un sistema Ponzi?</h2>
+            <p>En Dions Clicker, ganas DIONS haciendo clic. Los DIONS que ganas ahora tienen valor real: ¡pueden ser intercambiados por USDT a una tasa de 1 DION = $0.01 USD! Este proyecto se sostiene mediante publicidad y posibles compras dentro de la app, asegurando que no dependamos de nuevos usuarios para recompensar a los existentes.</p>
+            <p>Ahora, los envíos de DIONS a tu billetera son simulados, pero estamos trabajando para implementar el canje real por USDT en el futuro.</p>
+            <h3>Nuestro modelo sostenible se basa en:</h3>
+            <ul>
+                <li><strong>Valor Real:</strong> Ganas DIONS por tu actividad en el juego.</li>
+                <li><strong>Transparencia:</strong> Explicamos claramente cómo ganas DIONS y cómo planeamos generar ingresos.</li>
+                <li><strong>Sostenibilidad:</strong> Dependemos de la publicidad y las compras dentro de la app para mantener el juego.</li>
+            </ul>
+        </section>
+        <section id="why-use">
+            <h2>¿Por qué usar Dions Clicker?</h2>
+            <ul>
+                <li><strong>Gana dinero fácilmente:</strong> Con solo 100 clics al día, puedes generar ingresos adicionales en DIONS.</li>
+                <li><strong>Sistema progresivo:</strong> Las herramientas como el auto clic y el multiplicador te permiten aumentar tus ganancias sin esfuerzo adicional.</li>
+                <li><strong>Diversión y productividad:</strong> Convierte el entretenimiento en una actividad que también ofrece beneficios reales.</li>
+            </ul>
+        </section>
+
+        <!-- Mini-Games Section -->
+        <section id="mini-games">
+            <h2>Mini-Juegos</h2>
+            <div class="mini-game-container">
+                <div class="mini-game" id="time-challenge">
+                    <h3>Reto de tiempo</h3>
+                    <p>Haz clic lo más rápido posible en 10 segundos.</p>
+                    <button id="start-time-challenge">¡Comenzar!</button>
+                    <div id="time-challenge-score"></div>
+                </div>
+                <div class="mini-game" id="quick-puzzle">
+                    <h3>Rompecabezas rápido</h3>
+                    <p>Resuelve este acertijo rápido.</p>
+                    <div id="puzzle-container">
+                        <!-- Acertijo aquí -->
+                    </div>
+                    <button id="solve-puzzle">Resolver</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Profile Customization Section -->
+        <section id="profile-customization">
+            <h2>Personalización del perfil</h2>
+            <div class="avatar-selection">
+                <h3>Elige tu avatar</h3>
+                <!-- Avatares disponibles aquí -->
+            </div>
+            <div class="profile-stats">
+                <h3>Tus estadísticas</h3>
+                <p>Total de clics: <span id="total-clicks">0</span></p>
+                <p>DIONS acumulados: <span id="total-dions">0</span></p>
+                <p>Premios desbloqueados: <span id="unlocked-achievements">0</span></p>
+            </div>
+        </section>
+
+        <!-- Achievements Section -->
+        <section id="achievements">
+            <h2>Logros</h2>
+            <ul id="achievements-list">
+                <li>Primeros 1,000 clics - <span class="achievement-status">Pendiente</span></li>
+                <li>Cinco días consecutivos jugando - <span class="achievement-status">Pendiente</span></li>
+                <!-- Más logros aquí -->
+            </ul>
+        </section>
+
+        <!-- Leaderboard Section -->
+        <section id="leaderboard">
+            <h2>Tabla de clasificación</h2>
+            <div class="leaderboard-tabs">
+                <button class="tab-button active" data-tab="local">Local</button>
+                <button class="tab-button" data-tab="global">Global</button>
+            </div>
+            <div class="leaderboard-content" id="local-leaderboard">
+                <!-- Tabla de clasificación local aquí -->
+            </div>
+            <div class="leaderboard-content" id="global-leaderboard" style="display: none;">
+                <!-- Tabla de clasificación global aquí -->
+            </div>
+        </section>
+    </main>
+
+    <section id="nft-collection">
+        <h2>Colección NFT - Hombres de Negro</h2>
+        <p>Compra un NFT para aumentar tus clics.</p>
+        <div id="nft-container">
+            <!-- NFT 1 -->
+            <div class="nft-item">
+                <img src="https://i.seadn.io/gae/eSyvjBfL96u_Q4-zfm0n45_KkQ_VpT91I-a1H6QY6R6z_M_aM5kHhU9hUe6j-4D6v_2U_VfNn6G5g5-Q8V21b96-XzE61cE9pL?auto=format&c=true&w=256" alt="[Placeholder] NFT: Rookie Agent - Men in Black style character with standard black suit and sunglasses, holding a neuralyzer." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Agente Novato</h3>
+                <p>+1 clic</p>
+                <button class="nft-purchase-button">Comprar (150 DIONS)</button>
+            </div>
+            
+            <!-- NFT 2 -->
+            <div class="nft-item">
+                <img src="https://i.seadn.io/gae/pP_cUc3-TjT91R8K5nLNd6hC-FvsJtWnF3m0p_4oJd47g3Sg_9uVR523K2g_6l8s70z0jG1J5u0U_8V70Wv6J0R43tJk8nQp-r?auto=format&c=true&w=256" alt="[Placeholder] NFT: Agent in Training - Men in Black style character with a slightly disheveled black suit, adjusting sunglasses, holding a standard issue blaster." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Agente Entrenamiento</h3>
+                <p>+2 clics</p>
+                <button class="nft-purchase-button">Comprar (300 DIONS)</button>
+            </div>
+
+            <!-- NFT 3 -->
+            <div class="nft-item">
+                <img src="https://i.seadn.io/gae/y-0WjN9E_lVn6Yx44x1oR_b-mHhX28t6B5VqJ3F79c8-iN-zVl-y2qgG4xI95675J3cO0T3l82J-Wj_l9r4q8J7H7U4i_jR?auto=format&c=true&w=256" alt="[Placeholder] NFT: Agent in Action - Men in Black style character firing a large energy weapon, suit is slightly damaged, action pose." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Agente en Accion</h3>
+                <p>+3 clics</p>
+                <button class="nft-purchase-button">Comprar (450 DIONS)</button>
+            </div>
+
+            <!-- NFT 4 -->
+            <div class="nft-item">
+                <img src="https://i.seadn.io/gae/I21j_80D5W3o_G0v6P7G6f831X-W-GPGXk_c5G7pXJ6c-w57T6h6E3t1GkR0_66g0-2E78rV86h4_Y-kYhH83K3P91dM5k3k-hV?auto=format&c=true&w=256" alt="[Placeholder] NFT: Experienced Agent - Men in Black style character with a stern expression, holding a smoking blaster, black suit in good condition." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Agente con experiencia</h3>
+                <p>+4 clics</p>
+                <button class="nft-purchase-button">Comprar (600 DIONS)</button>
+            </div>
+
+             <!-- NFT 5 -->
+             <div class="nft-item">
+                <img src="https://i.seadn.io/gae/9wH0l5F1j5r74x6sI8_y2y26e_q5Q-E0c7lH_Kx7zJt31GvW-Yc-tQh2hH8K4f83b4h208g5T2pD4t2n1X5K54b7j2o6A?auto=format&c=true&w=256" alt="[Placeholder] NFT: Special Agent - Men in Black style character with advanced gadget on wrist, confident pose, impeccably clean suit." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Agente Especial</h3>
+                <p>+5 clics</p>
+                <button class="nft-purchase-button">Comprar (750 DIONS)</button>
+            </div>
+
+            <!-- NFT 6 -->
+            <div class="nft-item">
+                <img src="https://i.seadn.io/gae/Dq0e9qQO23L-2hNq-Q0u-4wM5D9K9sVv4c92m6x-JzY47Wj-4sWv1UjX44nI5z8d3q3k349v30c3G9v6g9X66g6Q3E0-tS?auto=format&c=true&w=256" alt="[Placeholder] NFT: Elite Agent - Men in Black style character with futuristic glasses, holding a unique alien artifact, perfect suit." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Agente Elite</h3>
+                <p>+6 clics</p>
+                <button class="nft-purchase-button">Comprar (900 DIONS)</button>
+            </div>
+
+             <!-- NFT 7 -->
+             <div class="nft-item">
+                <img src="https://i.seadn.io/gae/e9c_jGz1e18tqE6Q9I_Q0u1D9O4o3G1G-o6g8R8y1w3q6q1i5o3S5h2N4a8w1w4X6h5d4c7a6g7v5d6q5S5h3N4a8w?auto=format&c=true&w=256" alt="[Placeholder] NFT: Assistant Director - Men in Black style character, slightly older, holding a cup of coffee, overseeing a chaotic scene in the background, wearing a tie with a subtle alien design." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Director Auxiliar</h3>
+                <p>+7 clics</p>
+                <button class="nft-purchase-button">Comprar (1050 DIONS)</button>
+            </div>
+
+            <!-- NFT 8 -->
+            <div class="nft-item">
+                <img src="https://i.seadn.io/gae/H5_k5N6f-E8D3j9y8j9c7x6z7q5j2u6h2n6y7g7q7s6v5x3z2n4b5v7c9x8z7q5j2u?auto=format&c=true&w=256" alt="[Placeholder] NFT: Associate Director - Men in Black style character, standing in front of a holographic display showing alien planets, suit slightly rumpled, confident but tired expression." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Director Asociado</h3>
+                <p>+8 clics</p>
+                <button class="nft-purchase-button">Comprar (1200 DIONS)</button>
+            </div>
+
+             <!-- NFT 9 -->
+             <div class="nft-item">
+                <img src="https://i.seadn.io/gae/K6_t4N3d5h-G8c0l3z9s3r9z7t8p3q8d4v4d3v3b2s1x7n4q4w7e8p7r9t6w5z4q3w2e1r?auto=format&c=true&w=256" alt="[Placeholder] NFT: Executive Director - Men in Black style character, sitting at a large desk with multiple screens, serious expression, suit perfect, has a unique alien pen in their pocket." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Director Ejecutivo</h3>
+                <p>+9 clics</p>
+                <button class="nft-purchase-button">Comprar (1350 DIONS)</button>
+            </div>
+
+            <!-- NFT 10 -->
+            <div class="nft-item">
+                <img src="https://i.seadn.io/gae/k8e8X8q7Q6N0X3w5S8c6l8z9o1d3l3g8v8q8g7p6n4o7m1z2x7c8v9b8n7m6l5k4j3h2g1f0e?auto=format&c=true&w=256" alt="[Placeholder] NFT: Chief of Agents - Men in Black style character, standing in a hangar full of alien technology, authoritative pose, sunglasses slightly askew, perfect suit, holding a glowing orb." class="nft-image temp-image" onerror="this.onerror=null; this.src='image_placeholder.png'">
+                <h3>Jefe de Agentes</h3>
+                <p>+10 clics</p>
+                <button class="nft-purchase-button">Comprar (1500 DIONS)</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="ads">
+            <!-- Aquí irían los anuncios -->
+            <p>Anuncio Banner</p>
+        </div>
+        <div class="social-links">
+            <!-- Enlaces a redes sociales -->
+        </div>
+        <div class="contact-info">
+            <!-- Información de contacto y política de privacidad -->
+        </div>
+    </footer>
+
+    <!-- Registration Modal -->
+    <div id="registration-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-registration-modal">&times;</span>
+            <h2>¡Únete a la diversión con Dions Clicker!</h2>
+            <p>Regístrate para empezar a ganar DIONS y disfrutar del juego.</p>
+            <form id="registration-form">
+                <label for="register-username">Nombre de usuario:</label>
+                <input type="text" id="register-username" name="register-username" required placeholder="Crea tu nombre único para destacar en la comunidad de Dions Clicker.">
+
+                <label for="register-email">Correo electrónico:</label>
+                <input type="email" id="register-email" name="register-email" required placeholder="Introduce un correo válido para registrar tu progreso y recibir noticias importantes.">
+
+                <label for="register-password">Contraseña:</label>
+                <input type="password" id="register-password" name="register-password" required placeholder="Elige una contraseña segura. Debe contener al menos 8 caracteres.">
+                <p id="password-requirements">La contraseña debe tener al menos 8 caracteres.</p>
+
+                <button type="submit">Registrarme ahora</button>
+            </form>
+
+            <div class="social-login">
+                <p>O regístrate con:</p>
+                <button class="social-button google">Regístrate con Google</button>
+                <button class="social-button facebook">Regístrate con Facebook</button>
+                <button class="social-button twitter">Regístrate con Twitter</button>
+            </div>
+
+            <button id="register-metamask">Regístrate conectando tu billetera MetaMask</button>
+            <p>Al registrarte, aceptas nuestros <a href="#">Términos y Condiciones</a> y <a href="#">Política de Privacidad</a>.</p>
+            <p>¿Ya tienes una cuenta? <a href="#" id="open-login-modal">Iniciar sesión</a></p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" id="close-login-modal">&times;</span>
+            <h2>Iniciar sesión</h2>
+            <form id="login-form">
+                <label for="login-email">Correo electrónico:</label>
+                <input type="email" id="login-email" name="login-email" required>
+
+                <label for="login-password">Contraseña:</label>
+                <input type="password" id="login-password" name="login-password" required>
+
+                <button type="submit">Iniciar sesión</button>
+            </form>
+            <p>¿No tienes una cuenta? <a href="#" id="open-registration-modal">Regístrate</a></p>
+        </div>
+    </div>
+</body>
+</html>
