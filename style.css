@@ -1,260 +1,343 @@
-let dions = 0;
-let clicks = 0;
-let autoClickActive = false;
-let multiplierActive = false;
-let walletAddress = null;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e0f7fa; 
+    color: #2e7d32; 
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+}
 
-let dailyLimit = 1000000; // Daily DION limit
-let emittedToday = 0; // Dions emitted today
-const emissionResetHour = 0; // Hour at which the daily emission resets
-let dailyClicksLimit = 100; // Daily click limit per user
-let userClicksToday = 0; // Clicks made by the user today
+header {
+    background-color: #a5d6a7; 
+    padding: 20px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
 
-document.addEventListener('DOMContentLoaded', () => {
-    const dionsCounter = document.getElementById('dions-counter');
-    const clickButton = document.getElementById('click-button');
-    const connectWalletButton = document.getElementById('connect-wallet');
-    const walletAddressDisplay = document.getElementById('wallet-address');
-    const autoClickButton = document.getElementById('auto-click');
-    const multiplierButton = document.getElementById('multiplier');
-    const tutorialModal = document.getElementById('tutorial-modal');
-    const closeButton = document.querySelector('.close-button');
-    const dailyLimitInfo = document.getElementById('daily-limit-info');
-    const upgradeNotification = document.getElementById('upgrade-notification');
+main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    flex-grow: 1;
+}
 
-    let autoClickCount = 0; // Counter for auto-click upgrades
-    const autoClickLimit = 3; // Limit of auto-click upgrades
+#dions-counter {
+    font-size: 2.5em;
+    color: #1b5e20; 
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
 
-    let multiplierCount = 0; // Counter for multiplier upgrades
-    const multiplierLimit = 3; // Limit of multiplier upgrades
+#click-button {
+    padding: 15px 30px;
+    font-size: 1.2em;
+    background-color: #ffca28; 
+    color: #212121;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out, box-shadow 0.1s ease-in-out;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+}
 
-    // Function to show upgrade notifications
-    function showUpgradeNotification(message) {
-        upgradeNotification.textContent = message;
-        upgradeNotification.style.display = 'block';
-        setTimeout(() => {
-            upgradeNotification.style.display = 'none';
-        }, 3000); // Hide after 3 seconds
+#click-button:hover {
+    background-color: #fdd835; 
+    box-shadow: 0 5px 8px rgba(0, 0, 0, 0.3);
+}
+
+#click-button:active {
+    transform: scale(1.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+#connect-wallet {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #29b6f6; 
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#connect-wallet:hover {
+    background-color: #039be5; 
+}
+
+#wallet-address {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #3f51b5; 
+}
+
+#upgrades {
+    margin-top: 30px;
+    text-align: center;
+}
+
+#upgrades button {
+    margin: 5px;
+    padding: 8px 16px;
+    font-size: 1em;
+    background-color: #ffca28; 
+    color: #212121; 
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease-in-out;
+}
+
+#upgrades button:hover {
+    background-color: #fdd835; 
+    transform: scale(1.05);
+}
+
+#upgrades button:active {
+    transform: scale(1.1);
+}
+
+#upgrades button:disabled {
+    background-color: #bdbdbd; 
+    color: #757575;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+#upgrades button:disabled:hover {
+    background-color: #bdbdbd;
+}
+
+#upgrade-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(0, 150, 136, 0.9); 
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    z-index: 1000;
+    display: none;
+}
+
+.floating-text {
+    position: absolute;
+    font-size: 1.2em;
+    color: gold; 
+    animation: floatText 1s forwards;
+}
+
+@keyframes floatText {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
     }
-
-    // Function to create floating text
-    function createFloatingText(message) {
-        const floatingText = document.createElement('div');
-        floatingText.classList.add('floating-text');
-        floatingText.textContent = message;
-        clickButton.appendChild(floatingText);
-        floatingText.addEventListener('animationend', () => floatingText.remove());
+    100% {
+        transform: translateY(-30px);
+        opacity: 0;
     }
+}
 
-    // Function to update the daily limit counter
-    function updateCounter() {
-        dailyLimitInfo.textContent = `DIONS emitidos hoy: ${emittedToday}/${dailyLimit}`;
-    }
+footer {
+    background-color: #a5d6a7; 
+    padding: 10px;
+    text-align: center;
+    width: 100%;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+}
 
-    // Function to check and reset the daily limit if needed
-    function checkDailyReset() {
-        const now = new Date();
-        if (localStorage.getItem('lastResetDate')) {
-            const lastResetDate = new Date(localStorage.getItem('lastResetDate'));
-            if (now.getDate() !== lastResetDate.getDate()) {
-                emittedToday = 0;
-                localStorage.setItem('lastResetDate', now.toDateString());
-                updateCounter();
-            }
-        } else {
-            localStorage.setItem('lastResetDate', now.toDateString());
-        }
-    }
+.ads {
+    margin-bottom: 10px;
+    color: #558b2f; 
+}
 
-    // Function to update the daily clicks counter
-    function updateClicksCounter() {
-        dailyLimitInfo.textContent = `DIONS emitidos hoy: ${emittedToday}/${dailyLimit} | Clics restantes: ${dailyClicksLimit - userClicksToday}`;
-    }
+#daily-limit-info {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+    color: #795548;
+}
 
-    // Function to check and reset the daily click limit if needed
-    function checkDailyClicksReset() {
-        const now = new Date();
-        if (localStorage.getItem('lastClicksResetDate')) {
-            const lastClicksResetDate = new Date(localStorage.getItem('lastClicksResetDate'));
-            if (now.getDate() !== lastClicksResetDate.getDate()) {
-                userClicksToday = 0;
-                localStorage.setItem('lastClicksResetDate', now.toDateString());
-                updateClicksCounter();
-            }
-        } else {
-            localStorage.setItem('lastClicksResetDate', now.toDateString());
-        }
-    }
+/* Modal styles */
+.modal {
+    display: none; 
+    position: fixed; 
+    z-index: 1; 
+    left: 0;
+    top: 0;
+    width: 100%; 
+    height: 100%; 
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.4); 
+}
 
-    // Function to check if auto-click limit is reached
-    function isAutoClickLimitReached() {
-        return autoClickCount >= autoClickLimit;
-    }
+.modal-content {
+    background-color: #fffde7; 
+    margin: 15% auto; 
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; 
+}
 
-    // Function to check if multiplier limit is reached
-    function isMultiplierLimitReached() {
-        return multiplierCount >= multiplierLimit;
-    }
+.close-button {
+    color: #757575; 
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
 
-    // Function to update button states
-    function updateButtonStates() {
-        autoClickButton.disabled = autoClickActive || dions < 50 || isAutoClickLimitReached();
-        multiplierButton.disabled = multiplierActive || dions < 100 || isMultiplierLimitReached();
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
 
-        if (isAutoClickLimitReached()) {
-            autoClickButton.textContent = 'Auto-clic (Max)';
-        } else {
-            autoClickButton.textContent = 'Auto-clic (50 DIONS)';
-        }
+/* Mini-Games Section Styles */
+#mini-games {
+    margin-top: 30px;
+    text-align: center;
+}
 
-        if (isMultiplierLimitReached()) {
-            multiplierButton.textContent = 'Multiplicador x2 (Max)';
-        } else {
-            multiplierButton.textContent = 'Multiplicador x2 (100 DIONS)';
-        }
-    }
+.mini-game-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
 
-    // Initialize the counter and check for reset on page load
-    checkDailyReset();
-    checkDailyClicksReset();
-    updateClicksCounter();
-    updateButtonStates();
+.mini-game {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    width: 45%;
+}
 
-    if (!localStorage.getItem('tutorialShown')) {
-        tutorialModal.style.display = 'block';
-        localStorage.setItem('tutorialShown', 'true');
-    }
+/* Profile Customization Section Styles */
+#profile-customization {
+    margin-top: 30px;
+    text-align: center;
+}
 
-    closeButton.addEventListener('click', () => {
-        tutorialModal.style.display = 'none';
-    });
+.avatar-selection {
+    margin-bottom: 20px;
+}
 
-    window.addEventListener('click', (event) => {
-        if (event.target === tutorialModal) {
-            tutorialModal.style.display = 'none';
-        }
-    });
+.profile-stats {
+    margin-top: 20px;
+}
 
-    clickButton.addEventListener('click', () => {
-        if (userClicksToday < dailyClicksLimit) {
-            let increment = 1;
-            if (multiplierActive) {
-                increment *= 2;
-                createFloatingText('x2');
-            }
+/* Achievements Section Styles */
+#achievements {
+    margin-top: 30px;
+    text-align: center;
+}
 
-            if (emittedToday + increment <= dailyLimit) {
-                clicks++;
-                userClicksToday++;
-                dions += increment;
-                emittedToday += increment; // Update emitted DIONS
-                dionsCounter.textContent = `DIONS: ${dions}`;
-                updateClicksCounter(); // Update the displayed counter
-                updateButtonStates();
+#achievements-list {
+    list-style: none;
+    padding: 0;
+}
 
-                if (clicks % 100 === 0) {
-                    sendDionsToWallet();
-                }
-            } else {
-                alert('Se alcanzó el límite diario de DIONS.');
-            }
-        } else {
-            alert('Has alcanzado el límite de clics diarios.');
-        }
-    });
+#achievements-list li {
+    margin: 5px 0;
+}
 
-    connectWalletButton.addEventListener('click', async () => {
-        if (typeof window.ethereum !== 'undefined') {
-            try {
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
+.achievement-status {
+    font-weight: bold;
+}
 
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-                walletAddress = accounts[0];
-                walletAddressDisplay.textContent = `Billetera conectada: ${walletAddress}`;
-                connectWalletButton.disabled = true;
-            } catch (error) {
-                console.error("Error connecting to MetaMask:", error);
-                walletAddressDisplay.textContent = "Error al conectar la billetera.";
-            }
-        } else {
-            walletAddressDisplay.textContent = "MetaMask no está instalado.";
-        }
-    });
+/* Leaderboard Section Styles */
+#leaderboard {
+    margin-top: 30px;
+    text-align: center;
+}
 
-    autoClickButton.addEventListener('click', () => {
-        if (dions >= 50 && !autoClickActive && !isAutoClickLimitReached()) {
-            if (emittedToday + 50 <= dailyLimit) {
-                dions -= 50;
-                emittedToday += 50;
-                dionsCounter.textContent = `DIONS: ${dions}`;
-                updateClicksCounter();
-                autoClickActive = true;
-                autoClickButton.disabled = true;
-                showUpgradeNotification('¡Auto clic activado!');
-                updateButtonStates();
-                autoClickCount++;
-                setInterval(() => {
-                    let increment = 1;
-                    if (multiplierActive) {
-                        increment *= 2;
-                    }
-                    if (emittedToday + increment <= dailyLimit && userClicksToday < dailyClicksLimit) {
-                        dions += increment;
-                        clicks++;
-                        userClicksToday++;
-                        emittedToday += increment;
-                        dionsCounter.textContent = `DIONS: ${dions}`;
-                        updateClicksCounter();
-                        updateButtonStates();
-                        if (clicks % 100 === 0) {
-                            sendDionsToWallet();
-                        }
-                    } else {
-                        if (emittedToday + increment > dailyLimit) {
-                            alert('Se alcanzó el límite diario de DIONS.');
-                        } else {
-                            alert('Has alcanzado el límite de clics diarios.');
-                        }
-                    }
-                }, 1000);
-            } else {
-                alert('Se alcanzó el límite diario de DIONS.');
-            }
-        } else {
-            alert('No tienes suficientes DIONS o la mejora ya está activa.');
-        }
-    });
+.leaderboard-tabs {
+    margin-bottom: 10px;
+}
 
-    multiplierButton.addEventListener('click', () => {
-        if (dions >= 100 && !multiplierActive && !isMultiplierLimitReached()) {
-            if (emittedToday + 100 <= dailyLimit) {
-                dions -= 100;
-                emittedToday += 100;
-                dionsCounter.textContent = `DIONS: ${dions}`;
-                updateClicksCounter();
-                multiplierActive = true;
-                multiplierButton.disabled = true;
-                showUpgradeNotification('¡Multiplicador x2 activado!');
-                updateButtonStates();
-                multiplierCount++;
-            } else {
-                alert('Se alcanzó el límite diario de DIONS.');
-            }
-        } else {
-            alert('No tienes suficientes DIONS o la mejora ya está activa.');
-        }
-    });
+.tab-button {
+    padding: 8px 16px;
+    font-size: 1em;
+    background-color: #ffca28;
+    color: #212121;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
 
-    async function sendDionsToWallet() {
-        if (walletAddress) {
-            console.log(`Simulating sending ${dions} DIONS to ${walletAddress}`);
-            alert(`Enviando ${dions} DIONS a tu billetera! (Simulado). Actualmente 1 DION = $0.01 USD, estamos trabajando para habilitar el canje real por USDT`);
+.tab-button:hover {
+    background-color: #fdd835;
+}
 
-            dions = 0;
-            dionsCounter.textContent = `DIONS: ${dions}`;
-            updateButtonStates();
-        } else {
-            alert('Por favor, conecta tu billetera MetaMask primero.');
-        }
-    }
-});
+.tab-button.active {
+    background-color: #fdd835;
+    font-weight: bold;
+}
+
+.leaderboard-content {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* NFT Section Styles */
+#nft-collection {
+    margin-top: 30px;
+    text-align: center;
+}
+
+#nft-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.nft-item {
+    width: 200px;
+    margin: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+    background-color: #f9f9f9;
+}
+
+.nft-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.nft-purchase-button {
+    padding: 8px 16px;
+    font-size: 1em;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.nft-purchase-button:hover {
+    background-color: #388e3c;
+}
+
+.temp-image {
+    border: 2px dashed red;
+    display: block;
+}
